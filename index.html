@@ -596,8 +596,8 @@ function renderProfit(){
 
   html+='<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:16px;margin:12px 0;border:1px solid var(--border)">';
   html+='<div style="display:flex;gap:12px">';
-  html+='<div style="flex:1;background:#0d1117;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text2)">今日收益</div><div style="color:var(--gold);font-size:20px;font-weight:800">'+todayTotal.toFixed(1)+'万</div><div style="font-size:10px;color:#ff9800">≈'+(todayTotal/255).toFixed(2)+'元</div></div>';
-  html+='<div style="flex:1;background:#0d1117;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text2)">本月累计</div><div style="color:#00e676;font-size:20px;font-weight:800">'+monthTotal.toFixed(0)+'万</div><div style="font-size:10px;color:#ff9800">≈'+(monthTotal/255).toFixed(0)+'元</div></div>';
+  html+='<div style="flex:1;background:#0d1117;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text2)">今日收益</div><div style="color:var(--gold);font-size:20px;font-weight:800">'+todayTotal.toFixed(1)+'万</div><div style="font-size:10px;color:#ff9800">≈'+(todayTotal*94/1000).toFixed(2)+'元</div></div>';
+  html+='<div style="flex:1;background:#0d1117;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text2)">本月累计</div><div style="color:#00e676;font-size:20px;font-weight:800">'+monthTotal.toFixed(0)+'万</div><div style="font-size:10px;color:#ff9800">≈'+(monthTotal*94/1000).toFixed(0)+'元</div></div>';
   html+='</div></div>';
 
   // Today's record list
@@ -613,7 +613,7 @@ function renderProfit(){
   }
   html+='</div>';
 
-  html+='<div style="font-size:10px;color:var(--text2);margin-top:12px;text-align:center">💡 按梦幻币比例255万/元折算 · 价格随市场实时更新</div>';
+  html+='<div style="font-size:10px;color:var(--text2);margin-top:12px;text-align:center">💡 按梦幻币比例94元/1000万折算 · 价格随市场实时更新</div>';
   el.innerHTML=html;
 }
 
