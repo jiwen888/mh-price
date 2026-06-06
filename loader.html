@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>梦幻物价·一代宗师</title>
+<style>
+:root{--bg:#0b1120;--card:#111b2e;--border:#1e2d4a;--text:#c8d0e0;--text2:#6b7a96;--gold:#f5c842;--green:#2ee89e;--red:#f5426c;--blue:#4da6ff;--purple:#a855f7}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body::after{content:'';position:fixed;inset:0;z-index:998;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='130'%3E%3Ctext x='12' y='45' font-size='17' fill='rgba(245,200,66,0.045)' font-weight='bold' font-family='sans-serif'%3E几闻人间意%3C/text%3E%3Ctext x='12' y='72' font-size='11' fill='rgba(245,200,66,0.035)' font-family='sans-serif'%3E独家物价·禁止转载%3C/text%3E%3Ctext x='12' y='95' font-size='10' fill='rgba(245,200,66,0.03)' font-family='sans-serif'%3E一代宗师%3C/text%3E%3C/svg%3E");background-repeat:repeat}
+.verified{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#f5c84233,#f5c84211);border:1px solid #f5c84244;border-radius:20px;padding:3px 10px;font-size:11px;color:var(--gold);font-weight:600;letter-spacing:1px}
+.verified .vdot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:vpulse 2s infinite}
+@keyframes vpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.hdr{background:linear-gradient(180deg,#0f1a30,var(--bg));padding:16px 16px 12px;position:sticky;top:0;z-index:50}
+.hdr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.hdr h1{font-size:18px;color:var(--gold);font-weight:700}
+.hdr .srv{font-size:11px;color:var(--text2);background:var(--card);padding:3px 8px;border-radius:4px;border:1px solid var(--border)}
+.update-tag{font-size:11px;padding:3px 10px;border-radius:12px;font-weight:600;white-space:nowrap}
+.update-tag.fresh{background:rgba(46,232,158,0.15);color:var(--green);border:1px solid rgba(46,232,158,0.3)}
+.update-tag.stale{background:rgba(245,200,66,0.15);color:var(--gold);border:1px solid rgba(245,200,66,0.3)}
+.search-bar{display:flex;gap:8px}
+.search-bar input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:15px;outline:none}
+.search-bar input::placeholder{color:#3a4a66}
+.search-bar input:focus{border-color:var(--gold)}
+.search-bar button{background:var(--gold);border:none;border-radius:10px;padding:10px 18px;color:var(--bg);font-weight:700;font-size:14px;cursor:pointer}
+.tabs{display:flex;gap:2px;padding:0 16px;background:var(--bg);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:10px 14px;font-size:13px;color:var(--text2);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:.2s}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:600}
+.page{display:none;padding:12px 16px 100px}
+.page.active{display:block}
+.cat-section{margin-bottom:16px}
+.cat-title{font-size:14px;font-weight:700;padding:8px 0 6px;display:flex;align-items:center;gap:6px}
+.cat-title .badge{font-size:10px;background:var(--border);color:var(--text2);padding:1px 6px;border-radius:4px;font-weight:400}
+.ptable{width:100%;border-collapse:collapse;font-size:13px}
+.ptable th{text-align:left;padding:6px 8px;color:var(--text2);font-size:11px;font-weight:600;border-bottom:1px solid var(--border)}
+.ptable td{padding:8px;border-bottom:1px solid #1e2d4a33}
+.ptable .pn{color:var(--text);font-weight:500}
+.ptable .pp{color:var(--gold);font-weight:700;white-space:nowrap}
+.ptable .ps{font-size:10px;color:var(--text2)}
+.pr-up{color:var(--green)!important}
+.pr-down{color:var(--red)!important}
+.flash-up{animation:flashUp 1s ease}
+.flash-down{animation:flashDown 1s ease}
+@keyframes flashUp{0%{background:rgba(46,232,158,0.3)}100%{background:transparent}}
+@keyframes flashDown{0%{background:rgba(245,66,108,0.3)}100%{background:transparent}}
+.new-tag{display:inline-block;font-size:9px;background:var(--red);color:#fff;padding:0 4px;border-radius:3px;margin-left:4px;font-weight:700}
+.foot-seal{text-align:center;padding:20px 16px 40px}
+.foot-seal .seal-line{width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 10px}
+.foot-seal .seal-txt{font-size:11px;color:#2a3a56;line-height:1.8}
+.foot-seal .seal-brand{color:var(--gold);font-weight:700;font-size:13px}
+.foot-seal .seal-warn{color:#f5426c88;font-size:10px;margin-top:4px}
+@media(max-width:400px){.ptable{font-size:12px}.ptable td{padding:6px 4px}}
+.search-results{margin-top:8px}
+.search-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.search-item .si-name{font-weight:700;color:var(--text);margin-bottom:4px}
+.search-item .si-price{color:var(--gold);font-size:16px;font-weight:700}
+.search-item .si-meta{font-size:10px;color:var(--text2);margin-top:2px}
+
+/* Lock overlay */
+.lock-overlay{position:fixed;inset:0;z-index:500;background:rgba(11,17,32,0.97);display:flex;align-items:center;justify-content:center;flex-direction:column}
+.lock-overlay.hidden{display:none}
+.lock-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px 28px;max-width:340px;width:90%;text-align:center}
+.lock-box h2{color:var(--gold);font-size:18px;margin-bottom:6px}
+.lock-box p{color:var(--text2);font-size:12px;margin-bottom:20px}
+.lock-box input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;outline:none;text-align:center;letter-spacing:2px;margin-bottom:12px}
+.lock-box input:focus{border-color:var(--gold)}
+.lock-box button{width:100%;background:var(--gold);border:none;border-radius:10px;padding:12px;color:var(--bg);font-weight:700;font-size:15px;cursor:pointer}
+.lock-box button:hover{opacity:.9}
+.lock-box .lock-hint{color:var(--text2);font-size:10px;margin-top:10px}
+.lock-err{color:var(--red);font-size:12px;margin-bottom:8px;display:none}
+
+/* Admin trigger */
+.admin-trigger{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:999;background:linear-gradient(180deg,#f5c842,#e6a817);color:var(--bg);font-weight:700;font-size:14px;padding:12px 6px;border-radius:8px 0 0 8px;cursor:pointer;writing-mode:vertical-rl;letter-spacing:4px;box-shadow:0 0 20px rgba(245,200,66,0.4);transition:.2s}
+.admin-trigger:hover{padding-right:10px;box-shadow:0 0 30px rgba(245,200,66,0.6)}
+
+/* Admin login */
+.admin-login-bg{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center}
+.admin-login-bg.show{display:flex}
+.admin-login-box{background:var(--card);border:1px solid var(--gold);border-radius:16px;padding:28px 24px;max-width:320px;width:90%}
+.admin-login-box h3{color:var(--gold);text-align:center;margin-bottom:16px;font-size:16px}
+.admin-login-box input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;outline:none;margin-bottom:10px}
+.admin-login-box input:focus{border-color:var(--gold)}
+.admin-login-box .al-btns{display:flex;gap:8px;margin-top:6px}
+.admin-login-box .al-btns button{flex:1;padding:10px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;border:none}
+.admin-login-box .al-cancel{background:var(--border);color:var(--text2)}
+.admin-login-box .al-confirm{background:var(--gold);color:var(--bg)}
+.admin-login-err{color:var(--red);font-size:12px;text-align:center;margin-top:8px;display:none}
+
+/* Admin panel */
+.admin-panel{position:fixed;top:0;right:-420px;width:400px;max-width:90vw;height:100vh;z-index:9999;background:var(--card);border-left:1px solid var(--border);overflow-y:auto;transition:.3s;padding:20px}
+.admin-panel.open{right:0}
+.admin-panel h3{color:var(--gold);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.admin-panel .close-btn{background:none;border:1px solid var(--border);color:var(--text2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.admin-panel .close-btn:hover{border-color:var(--red);color:var(--red)}
+.ap-section{margin-bottom:20px}
+.ap-section label{display:block;color:var(--text2);font-size:12px;margin-bottom:6px}
+.ap-section select,.ap-section input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;margin-bottom:8px}
+.ap-section select:focus,.ap-section input:focus{border-color:var(--gold)}
+.ap-btn{background:var(--gold);border:none;border-radius:8px;padding:8px 16px;color:var(--bg);font-weight:700;font-size:13px;cursor:pointer;margin-right:6px;margin-bottom:6px}
+.ap-btn:hover{opacity:.9}
+.ap-btn.danger{background:var(--red)}
+.ap-stats{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.ap-stat{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;text-align:center;flex:1;min-width:70px}
+.ap-stat .num{font-size:20px;font-weight:700;color:var(--gold)}
+.ap-stat .lbl{font-size:10px;color:var(--text2)}
+.key-list{max-height:300px;overflow-y:auto}
+.key-item{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;margin-bottom:6px;font-size:12px}
+.key-item .ki-code{font-family:monospace;color:var(--gold);font-size:11px;word-break:break-all}
+.key-item .ki-info{color:var(--text2);font-size:10px;margin-top:4px}
+.key-item .ki-used{color:var(--green)}
+.key-item .ki-expired{color:var(--red)}
+</style>
+</head>
+<body>
+
+<!-- Lock overlay -->
+<div class="lock-overlay" id="lockOverlay">
+  <div class="lock-box">
+    <h2>🔒 几闻人间意·物价通</h2>
+    <p>一代宗师独家数据·请输入卡密</p>
+    <div class="lock-err" id="lockErr">卡密无效或已过期</div>
+    <input type="text" id="keyInput" placeholder="输入卡密" autocomplete="off">
+    <button onclick="verifyKey()">验 证</button>
+    <div class="lock-hint">联系管理员获取卡密</div>
+  </div>
+</div>
+
+<!-- Admin trigger -->
+<div class="admin-trigger" onclick="showAdminLogin()">管理员</div>
+
+<!-- Admin login -->
+<div class="admin-login-bg" id="adminLoginBg">
+  <div class="admin-login-box">
+    <h3>🔐 管理员登录</h3>
+    <input type="text" id="adminUser" placeholder="账号" autocomplete="off">
+    <input type="password" id="adminPass" placeholder="密码" autocomplete="off">
+    <div class="admin-login-err" id="adminLoginErr">账号或密码错误</div>
+    <div class="al-btns">
+      <button class="al-cancel" onclick="hideAdminLogin()">取消</button>
+      <button class="al-confirm" onclick="adminLogin()">登录</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin panel -->
+<div class="admin-panel" id="adminPanel">
+  <h3>
+    <span>⚙️ 管理面板</span>
+    <button class="close-btn" onclick="closeAdminPanel()">✕</button>
+  </h3>
+  <div class="ap-stats" id="adminStats"></div>
+  <div class="ap-section">
+    <label>生成卡密</label>
+    <select id="adminDays">
+      <option value="1">1天体验</option>
+      <option value="7">7天周卡</option>
+      <option value="30">30天月卡</option>
+    </select>
+    <input type="number" id="adminCount" value="5" min="1" max="100" placeholder="数量">
+    <button class="ap-btn" onclick="genKeys()">生成</button>
+    <button class="ap-btn" onclick="exportKeys()">导出</button>
+    <button class="ap-btn danger" onclick="clearKeys()">清空</button>
+  </div>
+  <div class="key-list" id="keyList"></div>
+</div>
+
+<!-- Header -->
+<div class="hdr">
+  <div class="hdr-top">
+    <div>
+      <h1>💰 梦幻物价·一代宗师</h1>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+        <span class="verified"><span class="vdot"></span>已验证</span>
+        <span class="srv">一代宗师</span>
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div id="updateTimeTag" class="update-tag fresh">🕐 刚刚更新</div>
+      <div style="font-size:10px;color:var(--text2);margin-top:2px" id="totalCount">加载中…</div>
+    </div>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="搜物品名…" oninput="doSearch()">
+    <button onclick="doSearch()">搜</button>
+  </div>
+</div>
+
+<div class="tabs" id="tabBar">
+  <div class="tab active" onclick="switchTab('all')">全部</div>
+  <div class="tab" onclick="switchTab('cat0')">💎宝石</div>
+  <div class="tab" onclick="switchTab('cat1')">💰其他</div>
+  <div class="tab" onclick="switchTab('cat2')">📦环装</div>
+  <div class="tab" onclick="switchTab('cat3')">📜制造书</div>
+  <div class="tab" onclick="switchTab('cat4')">⚒️制造铁</div>
+  <div class="tab" onclick="switchTab('cat5')">💊药品/其他</div>
+  <div class="tab" onclick="switchTab('cat6')">🏆五宝/道具</div>
+  <div class="tab" onclick="switchTab('cat7')">⚔️点化/装备</div>
+  <div class="tab" onclick="switchTab('cat8')">⚔️阵法</div>
+  <div class="tab" onclick="switchTab('cat9')">📖普通兽决</div>
+  <div class="tab" onclick="switchTab('cat10')">🔥高级兽决</div>
+  <div class="tab" onclick="switchTab('profit')">💰五开收益</div>
+</div>
+
+<div id="searchResults" class="page" style="display:none;padding:12px 16px 100px"></div>
+<div class="page active" id="page-all"></div>
+<div class="page" id="page-cat0"></div>
+<div class="page" id="page-cat1"></div>
+<div class="page" id="page-cat2"></div>
+<div class="page" id="page-cat3"></div>
+<div class="page" id="page-cat4"></div>
+<div class="page" id="page-cat5"></div>
+<div class="page" id="page-cat6"></div>
+<div class="page" id="page-cat7"></div>
+<div class="page" id="page-cat8"></div>
+<div class="page" id="page-cat9"></div>
+<div class="page" id="page-cat10"></div>
+<div class="page" id="page-profit" style="padding:12px 16px 100px"></div>
+
+<div class="foot-seal">
+  <div class="seal-line"></div>
+  <div class="seal-brand">几闻人间意</div>
+  <div class="seal-txt">独家数据 · 一代宗师服务器<br>数据来源：世界频道/天台/摊位实时采集</div>
+  <div class="seal-warn">⚠️ 未经授权转载必究 · 卡密制保护</div>
+</div>
+
+<script>
+const ADMIN_USER='jiwen888';
+const ADMIN_PASS_HASH='aw_'+btoa('anlan0605');
+let isAdmin=false;
+
+let DATA={};
+let UPDATE_TIME=0;
+const CAT_MAP={0:'💎宝石',1:'💰其他',2:'📦环装',3:'📜制造书',4:'⚒️制造铁',5:'💊药品/其他',6:'🏆五宝/道具',7:'⚔️点化/装备',8:'⚔️阵法',9:'📖普通兽决',10:'🔥高级兽决'};
+
+// === Card Key System (Self-Validating) ===
+const CK_SECRET='jwry_mh_2026x';
+function ckHash(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0}return Math.abs(h).toString(36)}
+function encodeKey(days,ts){
+  const t=ts||Date.now();
+  const raw=t.toString(36)+'|'+days+'|'+CK_SECRET;
+  const sig=ckHash(raw);
+  const payload=btoa(t.toString(36)+':'+days+':'+sig).replace(/=+/g,'');
+  const seg=payload.match(/.{1,5}/g).join('-');
+  return 'MH-'+seg;
+}
+function decodeKey(code){
+  try{
+    if(!code.startsWith('MH-'))return null;
+    const payload=code.slice(3).replace(/-/g,'');
+    const decoded=atob(payload);
+    const parts=decoded.split(':');
+    if(parts.length!==3)return null;
+    const t=parseInt(parts[0],36);
+    const days=parseInt(parts[1]);
+    const sig=parts[2];
+    const expected=ckHash(t.toString(36)+'|'+days+'|'+CK_SECRET);
+    if(sig!==expected)return null;
+    return{createdAt:t,days:days};
+  }catch(e){return null}
+}
+function isAuthed(){try{const a=JSON.parse(localStorage.getItem('mh_ck_auth'));if(!a||!a.expire)return false;return Date.now()<a.expire}catch(e){return false}}
+function setAuthed(key,days){localStorage.setItem('mh_ck_auth',JSON.stringify({key:key,expire:Date.now()+days*86400000,days:days}))}
+
+// Track used keys to prevent reuse on same device
+function getUsedKeys(){try{return JSON.parse(localStorage.getItem('mh_ck_used')||'[]')}catch(e){return[]}}
+function addUsedKey(code){const u=getUsedKeys();u.push(code);localStorage.setItem('mh_ck_used',JSON.stringify(u))}
+function isKeyUsed(code){return getUsedKeys().includes(code)}
+
+function verifyKey(){
+  const inp=document.getElementById('keyInput').value.trim();
+  const errEl=document.getElementById('lockErr');
+  if(!inp){errEl.style.display='block';errEl.textContent='请输入卡密';return}
+  const info=decodeKey(inp);
+  if(!info){errEl.style.display='block';errEl.textContent='卡密无效';return}
+  if(isKeyUsed(inp)){errEl.style.display='block';errEl.textContent='卡密已使用';return}
+  const now=Date.now();
+  const expireAt=info.createdAt+info.days*86400000;
+  if(now>expireAt){errEl.style.display='block';errEl.textContent='卡密已过期';return}
+  addUsedKey(inp);
+  setAuthed(inp,info.days);
+  document.getElementById('lockOverlay').classList.add('hidden');
+  const remain=Math.ceil((expireAt-now)/86400000);
+  alert('✅ 验证成功！有效期'+remain+'天');
+  checkExpiry();
+}
+
+function checkExpiry(){
+  try{const a=JSON.parse(localStorage.getItem('mh_ck_auth'));if(!a)return;const r=Math.ceil((a.expire-Date.now())/86400000);if(r<=3&&r>0)alert('⏰ 卡密将在'+r+'天后到期，请及时续费')}catch(e){}
+}
+
+// === Admin System ===
+function showAdminLogin(){document.getElementById('adminLoginBg').classList.add('show')}
+function hideAdminLogin(){document.getElementById('adminLoginBg').classList.remove('show');document.getElementById('adminLoginErr').style.display='none'}
+
+function adminLogin(){
+  const u=document.getElementById('adminUser').value.trim();
+  const p=document.getElementById('adminPass').value;
+  if(u===ADMIN_USER&&'aw_'+btoa(p)===ADMIN_PASS_HASH){
+    isAdmin=true;
+    hideAdminLogin();
+    setAuthed('ADMIN',365);
+    document.getElementById('lockOverlay').classList.add('hidden');
+    openAdminPanel();
+  }else{
+    document.getElementById('adminLoginErr').style.display='block';
+  }
+}
+
+function openAdminPanel(){document.getElementById('adminPanel').classList.add('open');renderAdmin()}
+function closeAdminPanel(){document.getElementById('adminPanel').classList.remove('open')}
+
+function genKeys(){
+  const days=parseInt(document.getElementById('adminDays').value);
+  const count=Math.min(parseInt(document.getElementById('adminCount').value)||1,100);
+  let codes=[];
+  for(let i=0;i<count;i++){
+    codes.push(encodeKey(days));
+  }
+  renderAdmin();
+  alert('✅ 已生成'+count+'个['+days+'天]卡密\n\n'+codes.join('\n'));
+}
+
+function exportKeys(){
+  const keys=getUsedKeys();
+  let txt='几闻人间意·物价卡密\n生成时间: '+new Date().toLocaleString()+'\n\n';
+  keys.forEach(k=>{txt+=k+' (已使用)\n'});
+  const blob=new Blob([txt],{type:'text/plain'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='card_keys.txt';a.click();
+}
+
+function clearKeys(){if(confirm('确定清空使用记录？')){localStorage.removeItem('mh_ck_used');renderAdmin()}}
+
+function renderAdmin(){
+  const usedKeys=getUsedKeys();
+  const total=usedKeys.length;
+  document.getElementById('adminStats').innerHTML=
+    '<div class="ap-stat"><div class="num">'+total+'</div><div class="lbl">已激活</div></div>'+
+    '<div class="ap-stat"><div class="num" style="color:var(--green)">∞</div><div class="lbl">可生成</div></div>'+
+    '<div class="ap-stat"><div class="num" style="color:var(--blue)">自验证</div><div class="lbl">卡密类型</div></div>';
+  let html='';
+  usedKeys.slice().reverse().forEach(k=>{
+    const info=decodeKey(k);
+    if(info){
+      const expDate=new Date(info.createdAt+info.days*86400000).toLocaleDateString();
+      html+='<div class="key-item"><div class="ki-code">'+k+'</div><div class="ki-info">['+info.days+'天] 到期: '+expDate+' · <span class="ki-used">已使用</span></div></div>';
+    }
+  });
+  document.getElementById('keyList').innerHTML=html||'<div style="color:var(--text2);text-align:center;padding:20px">暂无使用记录</div>';
+}
+
+// === Update Time ===
+function setUpdateTime(){
+  UPDATE_TIME=Date.now();
+  localStorage.setItem('mh_update_time',UPDATE_TIME.toString());
+  renderUpdateTime();
+}
+function renderUpdateTime(){
+  const el=document.getElementById('updateTimeTag');
+  if(!UPDATE_TIME){if(localStorage.getItem('mh_update_time'))UPDATE_TIME=parseInt(localStorage.getItem('mh_update_time'));else return}
+  const diff=Math.floor((Date.now()-UPDATE_TIME)/60000);
+  if(diff<1)el.textContent='🕐 刚刚更新';
+  else if(diff<60)el.textContent='🕐 '+diff+'分钟前更新';
+  else if(diff<1440)el.textContent='🕐 '+Math.floor(diff/60)+'小时前更新';
+  else el.textContent='🕐 '+Math.floor(diff/1440)+'天前更新';
+  el.className='update-tag '+(diff<60?'fresh':'stale');
+}
+setInterval(renderUpdateTime,60000);
+
+// === Data & Rendering ===
+function classifyItem(name){
+  const n=name;
+  // 0: 宝石/符石
+  if(/宝石|符石|玛瑙|舍利|翡翠|光芒|太阳|月亮|黑宝|1级光芒|1级太阳|1级月亮|1级红玛|1级翡翠|1级舍利|1级黑宝|2级光芒|2级月亮|1J符石|2J符石|3J符石|新三符石|强化石/.test(n))return 0;
+  // 10: 高级兽决
+  if(/高级|高必杀|高偷袭|高敏捷|高防御|高夜战|高吸血|高连击|高神佑|高法爆|高法连|高法波|高魔心|高隐身|高飞行|高反震/.test(n))return 10;
+  // 9: 普通兽决/技能书
+  if(/普通兽决|兽决_|壁垒击破|^(幸运|强力|感知|招架|隐身|幸运)$/.test(n))return 9;
+  // 2: 环装
+  if(/环装|武器_环|头盔_环|女头_环|男头_环|女衣_环|男衣_环|腰带_环|鞋子_环|项链_环|铠甲_环|鞋腰_环|级武器|级防具|武器环/.test(n))return 2;
+  // 3: 制造书
+  if(/书$|制造书|头盔书|女头书|男武书|腰带书|铠甲书|鞋子书|鞋腰书|项链书|剑书|枪扇书|扇子书|男头书|女衣书/.test(n)&&!/兽决|技能|符石|符/.test(n))return 3;
+  // 4: 制造铁
+  if(/铁$|铁_/.test(n)||/[0-9]+铁/.test(n))return 4;
+  // 8: 阵法
+  if(/阵$|阵法/.test(n))return 8;
+  // 6: 五宝/道具/藏宝图
+  if(/五宝|c66|66|超级66|令牌|未开图|卷轴|圣王|夜光|大瓶|树苗|彩果|月华|摇钱|水属|盒子|珍珠|小66|藏宝图|避水珠|金刚石|定魂珠|龙鳞|金柳露|神兜兜|老虎卡片|梦幻币比例|龙鳞宝刀|巨灵神锤/.test(n))return 6;
+  // 7: 点化/装备/珍品
+  if(/点化|万里|黑魔|魔女|疾风|八卦|九州|腰玉|碧水|鬼牙|乾坤|七彩|楚楚|华光|兽王|飘带|七宝天衣|死亡斗篷|变异/.test(n))return 7;
+  // 5: 药品/消耗/其他
+  if(/药品|药_|血符|气血|金香|九转|内丹|凤凰|天眼|点化修炼|裁缝|剧情|修炼果|碧藕|血f|2药|青龙|伤符|云象捐|金柳露|血F|血f/.test(n))return 5;
+  return 1;
+}
+
+function getLatestPrice(dates){
+  const dk=Object.keys(dates).sort().reverse();
+  return dk.length?{...dates[dk[0]],dateKey:dk[0]}:null;
+}
+
+function getPrevPrice(dates){
+  const dk=Object.keys(dates).sort().reverse();
+  return dk.length>1?dates[dk[1]]:null;
+}
+
+function renderData(){
+  if(!Object.keys(DATA).length)return;
+  const cats={};
+  let totalCount=0;
+  for(const[name,dates]of Object.entries(DATA)){
+    totalCount++;
+    const cat=classifyItem(name);
+    if(!cats[cat])cats[cat]=[];
+    const latest=getLatestPrice(dates);
+    const prev=getPrevPrice(dates);
+    cats[cat].push({name,latest,prev,isNew:latest&&latest.dateKey&&latest.dateKey.includes('2026-06-06')});
+  }
+  document.getElementById('totalCount').textContent='共'+totalCount+'项';
+  // All tab
+  let allHtml='';
+  for(let c=0;c<=10;c++){
+    if(!cats[c]||!cats[c].length)continue;
+    allHtml+=renderCatSection(CAT_MAP[c]||'其他',cats[c]);
+  }
+  document.getElementById('page-all').innerHTML=allHtml;
+  // Category tabs
+  for(let c=0;c<=10;c++){
+    const el=document.getElementById('page-cat'+c);
+    if(!el)continue;
+    el.innerHTML=cats[c]&&cats[c].length?renderCatSection(CAT_MAP[c]||'其他',cats[c]):'<div style="text-align:center;color:var(--text2);padding:40px">暂无数据</div>';
+  }
+  renderProfit();
+  setUpdateTime();
+}
+
+function renderCatSection(title,items){
+  let html='<div class="cat-section"><div class="cat-title">'+title+' <span class="badge">'+items.length+'项</span></div>';
+  html+='<table class="ptable"><tr><th>物品</th><th>价格</th><th>来源</th></tr>';
+  items.forEach(it=>{
+    if(!it.latest)return;
+    const p=it.latest;
+    const priceStr=typeof p.price==='number'?p.price+(p.unit||'万'):p.price+(p.unit||'万');
+    let cls='',arrow='',newTag='';
+    if(it.prev&&typeof it.latest.price==='number'&&typeof it.prev.price==='number'){
+      const diff=it.latest.price-it.prev.price;
+      if(diff>0){cls='pr-up';arrow=' ▲';html+'<tr class="flash-up">'}
+      else if(diff<0){cls='pr-down';arrow=' ▼'}
+    }
+    if(it.isNew)newTag='<span class="new-tag">NEW</span>';
+    html+='<tr'+(cls==='pr-up'?' class="flash-up"':cls==='pr-down'?' class="flash-down"':'')+'><td class="pn">'+it.name+newTag+'</td><td class="pp '+cls+'">'+priceStr+arrow+'</td><td class="ps">'+(p.source||'')+'</td></tr>';
+  });
+  html+='</table></div>';
+  return html;
+}
+
+function getPrice(name){
+  const d=DATA[name];
+  if(!d)return 0;
+  const dk=Object.keys(d).sort().reverse();
+  if(!dk.length)return 0;
+  let p=d[dk[0]].price;
+  if(typeof p==='string'){
+    const m=p.match(/[\d.]+/);
+    p=m?parseFloat(m[0]):0;
+  }
+  return typeof p==='number'?p:parseFloat(p)||0;
+}
+
+function renderProfit(){
+  const el=document.getElementById('page-profit');
+  if(!el)return;
+  const PRODUCTS=[
+    {cat:'🔥 高级兽决',color:'#ff4444',items:[
+      {name:'高必杀',key:'高必杀_新',fb:2800},
+      {name:'高偷袭',key:'高偷袭_新',fb:2700},
+      {name:'高连击',key:'高级连击',fb:2100},
+      {name:'高吸血',key:'高级吸血',fb:1700},
+      {name:'高神佑',key:'高级神佑复生',fb:2700},
+      {name:'高魔心',key:'高级魔之心',fb:1300},
+      {name:'高法连',key:'高级法术连击',fb:200},
+      {name:'高法暴',key:'高级法术暴击',fb:150},
+      {name:'高法波',key:'高级法术波动',fb:60},
+      {name:'高敏捷',key:'高敏捷_新',fb:1800},
+      {name:'高夜战',key:'高级夜战',fb:1200},
+      {name:'高飞行',key:'高级飞行',fb:2200},
+      {name:'高反震',key:'高级反震',fb:1500},
+      {name:'高防御',key:'高级防御',fb:170},
+      {name:'高隐身',key:'高级隐身',fb:200},
+      {name:'高招架',key:'高级招架',fb:400},
+      {name:'高感知',key:'高级感知',fb:180},
+      {name:'高否定',key:'高级否定信仰',fb:150},
+    ]},
+    {cat:'📖 普通兽决',color:'#ff9800',items:[
+      {name:'夜战',key:'普通兽决_夜战',fb:190},
+      {name:'必杀',key:'普通兽决_必杀',fb:90},
+      {name:'吸血',key:'普通兽决_吸血',fb:100},
+      {name:'法爆',key:'普通兽决_法爆',fb:140},
+      {name:'法连',key:'普通兽决_法连',fb:75},
+      {name:'偷袭',key:'普通兽决_偷袭',fb:75},
+      {name:'驱鬼',key:'普通兽决_驱鬼',fb:65},
+      {name:'感知',key:'感知',fb:150},
+      {name:'隐身',key:'隐身',fb:200},
+      {name:'幸运',key:'幸运',fb:150},
+      {name:'强力',key:'强力',fb:150},
+      {name:'招架',key:'招架',fb:600},
+      {name:'壁垒',key:'壁垒击破',fb:150},
+      {name:'质量兽决',key:'普通兽决_质量兽决',fb:65},
+      {name:'三害/十害',key:'普通兽决_三害',fb:40},
+      {name:'慧根',key:'普通兽决_慧根',fb:45},
+      {name:'冥思',key:'普通兽决_冥思',fb:45},
+    ]},
+    {cat:'💎 宝石/符石',color:'#ab47bc',items:[
+      {name:'黑宝石',key:'1级黑宝石',fb:22},
+      {name:'红玛瑙',key:'1级红玛瑙',fb:20},
+      {name:'光芒石',key:'1级光芒石',fb:19},
+      {name:'太阳石',key:'1级太阳石',fb:17},
+      {name:'舍利子',key:'1级舍利子',fb:14},
+      {name:'月亮石',key:'1级月亮石',fb:13},
+      {name:'翡翠石',key:'1级翡翠石',fb:4},
+      {name:'1J符石',key:'1J符石',fb:68},
+      {name:'2J符石',key:'2J符石',fb:210},
+      {name:'3J符石',key:'3J符石',fb:50},
+      {name:'强化石',key:'强化石',fb:7},
+    ]},
+    {cat:'📦 环装',color:'#2196f3',items:[
+      {name:'80武器',key:'80武器_环装',fb:80},
+      {name:'80腰带',key:'80腰带_环装',fb:690},
+      {name:'80头盔',key:'80男头_环装',fb:830},
+      {name:'80鞋子',key:'80鞋子_环装_新',fb:970},
+      {name:'80项链',key:'80项链_环装',fb:590},
+      {name:'80衣服',key:'80男衣_环装',fb:415},
+      {name:'70腰带',key:'70腰带_环装_新',fb:173},
+      {name:'70鞋子',key:'70鞋子_环装_新',fb:122},
+      {name:'70项链',key:'70项链_环装_新',fb:91},
+      {name:'70头',key:'70男头_环装_新',fb:58},
+      {name:'70衣',key:'70男衣_环装_新',fb:58},
+      {name:'60武器',key:'60武器_环装_新',fb:25},
+      {name:'60腰带',key:'60腰带_环装',fb:60},
+      {name:'60项链',key:'60项链_环装',fb:45},
+    ]},
+    {cat:'🏆 五宝/道具',color:'#00bcd4',items:[
+      {name:'神兜兜',key:'神兜兜',fb:720},
+      {name:'令牌',key:'令牌',fb:335},
+      {name:'C66',key:'C66',fb:39},
+      {name:'大金柳',key:'大瓶金柳露',fb:62},
+      {name:'小66',key:'小66',fb:7},
+      {name:'盒子',key:'盒子',fb:6.5},
+      {name:'修炼果',key:'修炼果',fb:160},
+      {name:'树苗',key:'树苗',fb:110},
+      {name:'七彩花环',key:'七彩花环',fb:450},
+      {name:'卷轴',key:'卷轴',fb:10},
+      {name:'月华露',key:'月华露',fb:5},
+      {name:'碧藕',key:'碧藕',fb:4},
+      {name:'彩果',key:'彩果',fb:30},
+      {name:'天阵',key:'天阵',fb:600},
+      {name:'虎阵',key:'虎阵',fb:45},
+      {name:'风阵',key:'风阵',fb:35},
+    ]},
+    {cat:'⚔️ 点化/装备',color:'#795548',items:[
+      {name:'万里鞋',key:'万里追云履',fb:950},
+      {name:'黑魔冠',key:'黑魔冠',fb:860},
+      {name:'万里卷云',key:'万里卷云',fb:600},
+      {name:'疾风铃',key:'疾风之铃',fb:570},
+      {name:'魔女冠',key:'魔女发冠',fb:230},
+      {name:'圣王坠',key:'圣王坠',fb:700},
+      {name:'水风带',key:'水属性风带',fb:160},
+    ]},
+  ];
+  const STORAGE_KEY='mh_profit_records';
+  function getRecords(){
+    try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(e){return[]}
+  }
+  function saveRecords(r){localStorage.setItem(STORAGE_KEY,JSON.stringify(r))}
+  function todayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+
+  let html='<div style="margin-bottom:12px">';
+  html+='<div style="font-size:16px;font-weight:700;color:var(--gold)">💰 点产出算收益</div>';
+  html+='<div style="font-size:11px;color:var(--text2);margin-top:4px">刷完一波点一下，自动按实时物价算钱</div></div>';
+
+  // Product buttons by category
+  PRODUCTS.forEach(cat=>{
+    html+='<div style="margin-bottom:10px"><div style="font-size:13px;font-weight:600;color:'+cat.color+';margin-bottom:6px">'+cat.cat+'</div>';
+    html+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+    cat.items.forEach(it=>{
+      const p=getPrice(it.key)||it.fb;
+      html+='<button onclick="addProfitItem(\''+it.name+'\','+p+')" style="background:'+cat.color+'22;color:'+cat.color+';border:1px solid '+cat.color+'55;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;white-space:nowrap">'+it.name+' <span style="opacity:0.7">'+p+'万</span></button>';
+    });
+    html+='</div></div>';
+  });
+
+  // Today summary
+  const records=getRecords().filter(r=>r.date===todayKey());
+  const todayTotal=records.reduce((s,r)=>s+r.value,0);
+  const monthRecords=getRecords().filter(r=>r.date&&r.date.startsWith(todayKey().substring(0,7)));
+  const monthTotal=monthRecords.reduce((s,r)=>s+r.value,0);
+
+  html+='<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:16px;margin:12px 0;border:1px solid var(--border)">';
+  html+='<div style="display:flex;gap:12px">';
+  html+='<div style="flex:1;background:#0d1117;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text2)">今日收益</div><div style="color:var(--gold);font-size:20px;font-weight:800">'+todayTotal.toFixed(1)+'万</div><div style="font-size:10px;color:#ff9800">≈'+(todayTotal/255).toFixed(2)+'元</div></div>';
+  html+='<div style="flex:1;background:#0d1117;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text2)">本月累计</div><div style="color:#00e676;font-size:20px;font-weight:800">'+monthTotal.toFixed(0)+'万</div><div style="font-size:10px;color:#ff9800">≈'+(monthTotal/255).toFixed(0)+'元</div></div>';
+  html+='</div></div>';
+
+  // Today's record list
+  html+='<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:600;color:var(--text)">📋 今日记录</span><button onclick="clearProfitToday()" style="background:#ff444422;color:#ff4444;border:1px solid #ff444455;border-radius:4px;padding:3px 8px;font-size:11px;cursor:pointer">清空今日</button></div>';
+  if(records.length===0){
+    html+='<div style="text-align:center;color:var(--text2);padding:20px;font-size:13px">还没有记录，点上方按钮添加产出 💪</div>';
+  }else{
+    html+='<table class="ptable"><tr><th>物品</th><th>单价</th><th>时间</th><th></th></tr>';
+    records.forEach((r,i)=>{
+      html+='<tr><td class="pn">'+r.name+'</td><td class="pp">'+r.value+'万</td><td class="ps">'+r.time+'</td><td><button onclick="delProfitItem('+i+')" style="background:none;border:none;color:#ff4444;font-size:14px;cursor:pointer;padding:2px 6px">✕</button></td></tr>';
+    });
+    html+='</table>';
+  }
+  html+='</div>';
+
+  html+='<div style="font-size:10px;color:var(--text2);margin-top:12px;text-align:center">💡 按梦幻币比例255万/元折算 · 价格随市场实时更新</div>';
+  el.innerHTML=html;
+}
+
+function addProfitItem(name,value){
+  const STORAGE_KEY='mh_profit_records';
+  const records=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+  const now=new Date();
+  const timeStr=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  const dateStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  records.push({name,value,date:dateStr,time:timeStr});
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(records));
+  renderProfit();
+}
+
+function delProfitItem(todayIdx){
+  const STORAGE_KEY='mh_profit_records';
+  const records=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+  const todayKey2=(()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')})();
+  let ti=0;
+  for(let i=0;i<records.length;i++){
+    if(records[i].date===todayKey2){
+      if(ti===todayIdx){records.splice(i,1);break}
+      ti++;
+    }
+  }
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(records));
+  renderProfit();
+}
+
+function clearProfitToday(){
+  if(!confirm('确定清空今日所有记录？'))return;
+  const STORAGE_KEY='mh_profit_records';
+  const records=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+  const todayKey2=(()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')})();
+  const remaining=records.filter(r=>r.date!==todayKey2);
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(remaining));
+  renderProfit();
+}
+
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  event.target.classList.add('active');
+  document.getElementById('searchResults').style.display='none';
+}
+
+function doSearch(){
+  const kw=document.getElementById('searchInput').value.trim().toLowerCase();
+  const sr=document.getElementById('searchResults');
+  if(!kw){sr.style.display='none';document.getElementById('page-all').classList.add('active');return}
+  sr.style.display='block';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  let html='',count=0;
+  for(const[name,dates]of Object.entries(DATA)){
+    if(name.toLowerCase().includes(kw)||kw.split('').every(c=>name.includes(c))){
+      count++;
+      const dk=Object.keys(dates).sort().reverse();
+      const latest=dates[dk[0]];
+      const price=typeof latest.price==='number'?latest.price+(latest.unit||'万'):latest.price+(latest.unit||'万');
+      html+='<div class="search-item"><div class="si-name">'+name+'</div><div class="si-price">'+price+'</div><div class="si-meta">'+dk[0]+' · '+latest.source+'</div></div>';
+    }
+  }
+  if(!count)html='<div style="text-align:center;color:var(--text2);padding:40px">没找到相关物品 😅</div>';
+  sr.innerHTML=html;
+}
+
+// === Init ===
+function init(){
+  if(isAuthed()){
+    document.getElementById('lockOverlay').classList.add('hidden');
+    checkExpiry();
+  }
+  renderUpdateTime();
+  loadData();
+  // Show page immediately, data loads in background
+  document.getElementById('page-all').innerHTML='<div style="text-align:center;padding:40px;color:var(--text2)"><div id="loadStatus" style="font-size:14px">⏳ 正在加载最新价格数据...</div></div>';
+}
+
+function loadData(){
+  const API='https://gitee.com/api/v5/repos/hou-wenchen/mh-price/contents/latest_data.json?access_token=43fd5eabf5a4d2d0312bb65edfc59169&ref=master';
+  const statusEl=document.getElementById('loadStatus');
+  fetch(API).then(r=>{if(!r.ok)throw new Error('API '+r.status);return r.json()})
+  .then(d=>{
+    const raw=atob(d.content.replace(/\n/g,''));
+    const bytes=new Uint8Array(raw.length);
+    for(let i=0;i<raw.length;i++) bytes[i]=raw.charCodeAt(i);
+    const json=new TextDecoder('utf-8').decode(bytes);
+    DATA=JSON.parse(json);
+    if(statusEl)statusEl.textContent='✅ 数据加载完成';
+    setTimeout(()=>{const s=document.getElementById('loadStatus');if(s)s.style.display='none'},1500);
+    renderData();
+  })
+  .catch(e=>{
+    if(statusEl)statusEl.textContent='❌ 加载失败，请刷新重试';
+    console.error('Load data failed:',e);
+  });
+}
+
+// Auto refresh data every 5 min
+setInterval(loadData,300000);
+
+init();
+</script>
+</body>
+</html>
