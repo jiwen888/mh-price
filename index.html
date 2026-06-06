@@ -200,6 +200,7 @@ body::after{content:'';position:fixed;inset:0;z-index:998;pointer-events:none;ba
   <div class="tab" onclick="switchTab('cat8')">⚔️阵法</div>
   <div class="tab" onclick="switchTab('cat9')">📖普通兽决</div>
   <div class="tab" onclick="switchTab('cat10')">🔥高级兽决</div>
+  <div class="tab" onclick="switchTab('profit')">💰五开收益</div>
 </div>
 
 <div id="searchResults" class="page" style="display:none;padding:12px 16px 100px"></div>
@@ -215,6 +216,7 @@ body::after{content:'';position:fixed;inset:0;z-index:998;pointer-events:none;ba
 <div class="page" id="page-cat8"></div>
 <div class="page" id="page-cat9"></div>
 <div class="page" id="page-cat10"></div>
+<div class="page" id="page-profit" style="padding:12px 16px 100px"></div>
 
 <div class="foot-seal">
   <div class="seal-line"></div>
@@ -427,6 +429,7 @@ function renderData(){
     if(!el)continue;
     el.innerHTML=cats[c]&&cats[c].length?renderCatSection(CAT_MAP[c]||'其他',cats[c]):'<div style="text-align:center;color:var(--text2);padding:40px">暂无数据</div>';
   }
+  renderProfit();
   setUpdateTime();
 }
 
@@ -448,6 +451,90 @@ function renderCatSection(title,items){
   });
   html+='</table></div>';
   return html;
+}
+
+function getPrice(name){
+  const d=DATA[name];
+  if(!d)return 0;
+  const dk=Object.keys(d).sort().reverse();
+  if(!dk.length)return 0;
+  let p=d[dk[0]].price;
+  if(typeof p==='string'){
+    const m=p.match(/[\d.]+/);
+    p=m?parseFloat(m[0]):0;
+  }
+  return typeof p==='number'?p:parseFloat(p)||0;
+}
+
+function renderProfit(){
+  const el=document.getElementById('page-profit');
+  if(!el)return;
+  // Five-account daily profit calculator
+  const activities=[
+    {name:'🌀 抓鬼(25对小鬼)',items:[
+      {label:'60环装 ×3',key:'60武器_环装',qty:3,fallback:25},
+      {label:'70环装 ×2',key:'70武器_环装',qty:2,fallback:12},
+    ]},
+    {name:'🌀 抓鬼(25对大鬼)',items:[
+      {label:'80环装 ×1',key:'80武器_环装',qty:1,fallback:80},
+      {label:'60环装 ×2',key:'60武器_环装',qty:2,fallback:25},
+    ]},
+    {name:'🗺️ 宝图任务',items:[
+      {label:'藏宝图 ×5',key:'藏宝图_牌子',qty:5,fallback:280},
+    ]},
+    {name:'⚔️ 副本收益(乌鸡/水路/五庄)',items:[
+      {label:'修炼果 ×1',key:'修炼果',qty:1,fallback:160},
+      {label:'C66 ×1',key:'C66',qty:1,fallback:40},
+      {label:'强化石 ×2',key:'强化石',qty:2,fallback:5},
+    ]},
+    {name:'📦 师门任务(5号)',items:[
+      {label:'符石碎片收入',val:30},
+    ]},
+    {name:'💎 宝石日常(5号)',items:[
+      {label:'1级宝石 ×3',key:'1级月亮石',qty:3,fallback:12},
+    ]},
+    {name:'🔮 帮派任务',items:[
+      {label:'盒子 ×5',key:'盒子',qty:5,fallback:6.5},
+    ]},
+  ];
+  let totalDaily=0;
+  let html='<div style="margin-bottom:12px"><div style="font-size:16px;font-weight:700;color:var(--gold)">💰 五开日收益估算</div><div style="font-size:11px;color:var(--text2);margin-top:4px">基于当前物价自动计算 · 一代宗师服务器</div></div>';
+  html+='<table class="ptable" style="margin-bottom:8px"><tr><th>活动</th><th>产出</th><th>单价(万)</th><th>小计(万)</th></tr>';
+  activities.forEach(act=>{
+    let actTotal=0;
+    const rows=[];
+    act.items.forEach(it=>{
+      let unitPrice=it.val||0;
+      if(it.key) unitPrice=getPrice(it.key)||it.fallback||0;
+      const sub=unitPrice*(it.qty||1);
+      actTotal+=sub;
+      rows.push({label:it.label,unit:unitPrice.toFixed(1),sub:sub.toFixed(1)});
+    });
+    totalDaily+=actTotal;
+    rows.forEach((r,i)=>{
+      html+='<tr>';
+      if(i===0) html+='<td class="pn" rowspan="'+rows.length+'" style="vertical-align:top;white-space:nowrap">'+act.name+'</td>';
+      html+='<td style="color:var(--text2);font-size:12px">'+r.label+'</td><td class="pp">'+r.unit+'</td><td style="color:var(--gold);font-weight:600">'+r.sub+'</td></tr>';
+    });
+  });
+  html+='</table>';
+  // Summary
+  const weekTotal=(totalDaily*7).toFixed(0);
+  const monthTotal=(totalDaily*30).toFixed(0);
+  html+='<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:16px;margin-top:8px;border:1px solid var(--border)">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="color:var(--text2);font-size:13px">📊 日收益</span><span style="color:var(--gold);font-size:22px;font-weight:800">'+totalDaily.toFixed(0)+' 万</span></div>';
+  html+='<div style="display:flex;gap:12px">';
+  html+='<div style="flex:1;background:#0d1117;border-radius:8px;padding:10px;text-align:center"><div style="font-size:11px;color:var(--text2)">周收益</div><div style="color:#00e676;font-size:16px;font-weight:700">'+weekTotal+' 万</div></div>';
+  html+='<div style="flex:1;background:#0d1117;border-radius:8px;padding:10px;text-align:center"><div style="font-size:11px;color:var(--text2)">月收益</div><div style="color:#00e676;font-size:16px;font-weight:700">'+monthTotal+' 万</div></div>';
+  // Convert to RMB (255万/元)
+  const ratio=255;
+  const dailyRMB=(totalDaily/ratio).toFixed(2);
+  const monthRMB=(totalDaily*30/ratio).toFixed(0);
+  html+='<div style="flex:1;background:#0d1117;border-radius:8px;padding:10px;text-align:center"><div style="font-size:11px;color:var(--text2)">月折合RMB</div><div style="color:#ff9800;font-size:16px;font-weight:700">≈'+monthRMB+'元</div></div>';
+  html+='</div>';
+  html+='<div style="font-size:10px;color:var(--text2);margin-top:10px;text-align:center">💡 按梦幻币比例255万/元折算 · 实际收益视运气和活动浮动</div>';
+  html+='</div>';
+  el.innerHTML=html;
 }
 
 function switchTab(id){
