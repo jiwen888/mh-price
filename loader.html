@@ -695,15 +695,11 @@ function init(){
 }
 
 function loadData(){
-  const API='https://gitee.com/api/v5/repos/hou-wenchen/mh-price/contents/latest_data.json?access_token=43fd5eabf5a4d2d0312bb65edfc59169&ref=master';
+  const API='https://gitee.com/hou-wenchen/mh-price/raw/master/latest_data.json';
   const statusEl=document.getElementById('loadStatus');
   fetch(API).then(r=>{if(!r.ok)throw new Error('API '+r.status);return r.json()})
   .then(d=>{
-    const raw=atob(d.content.replace(/\n/g,''));
-    const bytes=new Uint8Array(raw.length);
-    for(let i=0;i<raw.length;i++) bytes[i]=raw.charCodeAt(i);
-    const json=new TextDecoder('utf-8').decode(bytes);
-    DATA=JSON.parse(json);
+    DATA=d;
     if(statusEl)statusEl.textContent='✅ 数据加载完成';
     setTimeout(()=>{const s=document.getElementById('loadStatus');if(s)s.style.display='none'},1500);
     renderData();
