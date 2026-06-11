@@ -540,9 +540,9 @@ function renderCatSection(title,items){
   return html;
 }
 
-function getPrice(name){
-  const SD=getSD();
-  const d=SD[name];
+function getPrice(name,srv){
+  const sd=srv?DATA[srv]||{}:getSD();
+  const d=sd[name];
   if(!d)return 0;
   const dk=Object.keys(d).sort().reverse();
   if(!dk.length)return 0;
@@ -554,9 +554,31 @@ function getPrice(name){
   return typeof p==='number'?p:parseFloat(p)||0;
 }
 
+function getGoldRatio(srv){
+  // 1. 先取该区服"梦幻币比例"
+  const SD=DATA[srv]||{};
+  const e=SD["梦幻币比例"];
+  if(e){const k=Object.keys(e).sort();const v=e[k[k.length-1]];if(v&&v.price)return v.price}
+  // 2. 从全服金价排名取
+  if(DATA['全服金价排名']){
+    const dk=Object.keys(DATA['全服金价排名']).sort().reverse();
+    const latest=DATA['全服金价排名'][dk[0]];
+    if(latest&&latest.data){
+      const found=latest.data.find(s=>s.server===srv);
+      if(found&&found.price)return found.price;
+    }
+  }
+  return 94; // fallback
+}
+
 function renderProfit(){
   const el=document.getElementById('page-profit');
   if(!el)return;
+  // profit区服选择，独立于主区服
+  const PROFIT_SRV_KEY='mh_profit_server';
+  let profitSrv=localStorage.getItem(PROFIT_SRV_KEY)||currentServer;
+  const SD=DATA[profitSrv]||{};
+  const ratio=getGoldRatio(profitSrv);
   const PRODUCTS=[
     {cat:'🔥 高级兽决',color:'#ff4444',items:[
       {name:'高必杀',key:'高必杀_新',fb:2800},
@@ -654,33 +676,42 @@ function renderProfit(){
       {name:'水风带',key:'水属性风带',fb:160},
     ]},
   ];
-  const STORAGE_KEY='mh_profit_records';
-  function getRecords(){
-    try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(e){return[]}
-  }
-  function saveRecords(r){localStorage.setItem(STORAGE_KEY,JSON.stringify(r))}
   function todayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 
   let html='<div style="margin-bottom:12px">';
   html+='<div style="font-size:16px;font-weight:700;color:var(--gold)">💰 点产出算收益</div>';
   html+='<div style="font-size:11px;color:var(--text2);margin-top:4px">刷完一波点一下，自动按实时物价算钱</div></div>';
 
+  // Server selector for profit page
+  const servers=(DATA._servers||[]).map(s=>s.name);
+  html+='<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
+  html+='<span style="font-size:13px;color:var(--text2)">🌐区服</span>';
+  html+='<select id="profitSrvSelect" onchange="changeProfitSrv(this.value)" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 10px;color:var(--gold);font-size:13px;font-weight:600;outline:none;cursor:pointer">';
+  servers.forEach(s=>{
+    html+='<option value="'+s+'"'+(s===profitSrv?' selected':'')+'>'+s+'</option>';
+  });
+  html+='</select>';
+  html+='<span style="font-size:11px;color:var(--text2)">金价:'+ratio+'元/千万</span>';
+  html+='</div>';
+
   // Product buttons by category
   PRODUCTS.forEach(cat=>{
     html+='<div style="margin-bottom:10px"><div style="font-size:13px;font-weight:600;color:'+cat.color+';margin-bottom:6px">'+cat.cat+'</div>';
     html+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
     cat.items.forEach(it=>{
-      const p=getPrice(it.key)||it.fb;
-      html+='<button onclick="addProfitItem(\''+it.name+'\','+p+')" style="background:'+cat.color+'22;color:'+cat.color+';border:1px solid '+cat.color+'55;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;white-space:nowrap">'+it.name+' <span style="opacity:0.7">'+p+'万</span></button>';
+      const p=getPrice(it.key,profitSrv)||it.fb;
+      html+='<button onclick="addProfitItem(\''+it.name+'\','+p+',\''+profitSrv+'\')" style="background:'+cat.color+'22;color:'+cat.color+';border:1px solid '+cat.color+'55;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;white-space:nowrap">'+it.name+' <span style="opacity:0.7">'+p+'万</span></button>';
     });
     html+='</div></div>';
   });
 
   // Today summary
-  const ratio=(function(){const SD=getSD();const e=SD["梦幻币比例"];if(!e)return 94;const k=Object.keys(e).sort();return e[k[k.length-1]].price||94})();
-  const records=getRecords().filter(r=>r.date===todayKey());
+  const PROFIT_RK='mh_profit_records_'+profitSrv;
+  function getPR(){try{return JSON.parse(localStorage.getItem(PROFIT_RK)||'[]')}catch(e){return[]}}
+  function savePR(r){localStorage.setItem(PROFIT_RK,JSON.stringify(r))}
+  const records=getPR().filter(r=>r.date===todayKey());
   const todayTotal=records.reduce((s,r)=>s+r.value,0);
-  const monthRecords=getRecords().filter(r=>r.date&&r.date.startsWith(todayKey().substring(0,7)));
+  const monthRecords=getPR().filter(r=>r.date&&r.date.startsWith(todayKey().substring(0,7)));
   const monthTotal=monthRecords.reduce((s,r)=>s+r.value,0);
 
   html+='<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:16px;margin:12px 0;border:1px solid var(--border)">';
@@ -702,12 +733,12 @@ function renderProfit(){
   }
   html+='</div>';
 
-  html+='<div style="font-size:10px;color:var(--text2);margin-top:12px;text-align:center">💡 按梦幻币比例'+ratio+'元/1000万折算 · 价格随市场实时更新</div>';
+  html+='<div style="font-size:10px;color:var(--text2);margin-top:12px;text-align:center">💡 '+profitSrv+' 金价:'+ratio+'元/千万 · 万→元自动折算 · 切换区服后价格和记录独立</div>';
   el.innerHTML=html;
 }
 
-function addProfitItem(name,value){
-  const STORAGE_KEY='mh_profit_records';
+function addProfitItem(name,value,srv){
+  const STORAGE_KEY='mh_profit_records_'+(srv||localStorage.getItem('mh_profit_server')||currentServer);
   const records=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
   const now=new Date();
   const timeStr=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
@@ -718,7 +749,8 @@ function addProfitItem(name,value){
 }
 
 function delProfitItem(todayIdx){
-  const STORAGE_KEY='mh_profit_records';
+  const profitSrv=localStorage.getItem('mh_profit_server')||currentServer;
+  const STORAGE_KEY='mh_profit_records_'+profitSrv;
   const records=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
   const todayKey2=(()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')})();
   let ti=0;
@@ -734,11 +766,17 @@ function delProfitItem(todayIdx){
 
 function clearProfitToday(){
   if(!confirm('确定清空今日所有记录？'))return;
-  const STORAGE_KEY='mh_profit_records';
+  const profitSrv=localStorage.getItem('mh_profit_server')||currentServer;
+  const STORAGE_KEY='mh_profit_records_'+profitSrv;
   const records=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
   const todayKey2=(()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')})();
   const remaining=records.filter(r=>r.date!==todayKey2);
   localStorage.setItem(STORAGE_KEY,JSON.stringify(remaining));
+  renderProfit();
+}
+
+function changeProfitSrv(srv){
+  localStorage.setItem('mh_profit_server',srv);
   renderProfit();
 }
 
