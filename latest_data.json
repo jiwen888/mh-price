@@ -2,136 +2,135 @@
   "_servers": [
     {
       "name": "一代宗师",
-      "zone": "大司马专区",
       "my": true
     },
     {
       "name": "无与伦比",
-      "zone": "大司马专区"
+      "my": false
     },
     {
       "name": "齐天大圣",
-      "zone": "大司马专区"
+      "my": false
     },
     {
       "name": "2025",
-      "zone": "大司马专区"
+      "my": false
     },
     {
       "name": "笑傲三界",
-      "zone": "大司马专区"
+      "my": false
     },
     {
       "name": "横扫千军",
-      "zone": "大司马专区"
+      "my": false
     },
     {
       "name": "龙卷雨击",
-      "zone": "大司马专区"
+      "my": false
     },
     {
       "name": "此最相思",
-      "zone": "大司马专区"
+      "my": false
     },
     {
       "name": "凌云殿",
-      "zone": "大司马专区"
+      "my": false
     },
     {
       "name": "天下无双",
-      "zone": "大司马专区"
+      "my": false
     },
     {
       "name": "将军令",
-      "zone": "大司马专区"
+      "my": false
     },
     {
       "name": "紫气东来",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "乘风破浪",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "纵横天下",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "再续前缘",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "大闹天宫",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "逍遥江湖",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "北俱芦洲",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "十方无敌",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "五谷丰登",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "钓鱼岛",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "恭喜发财",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "东海湾",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "群雄逐鹿",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "四海升平",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "生日快乐",
-      "zone": "珍宝专区"
+      "my": false
     },
     {
       "name": "平步青云",
-      "zone": "新区"
+      "my": false
     },
     {
       "name": "龙拳",
-      "zone": "新区"
+      "my": false
     },
     {
       "name": "苏堤春晓",
-      "zone": "新区"
+      "my": false
     },
     {
       "name": "游龙惊鸿",
-      "zone": "新区"
+      "my": false
     },
     {
       "name": "天蓬元帅",
-      "zone": "新区"
+      "my": false
     },
     {
       "name": "高级幸运",
-      "zone": "其他"
+      "my": false
     },
     {
       "name": "#24",
-      "zone": "其他"
+      "my": false
     }
   ],
   "一代宗师": {

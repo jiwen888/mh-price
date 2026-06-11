@@ -122,8 +122,6 @@ body::after{content:'';position:fixed;inset:0;z-index:998;pointer-events:none;ba
 .srv-overlay-inner{max-width:480px;margin:0 auto;padding:16px}
 .srv-overlay-title{font-size:16px;font-weight:700;color:var(--gold);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
 .srv-overlay-sub{font-size:11px;color:var(--text2);margin-bottom:16px}
-.srv-zone{margin-bottom:16px}
-.srv-zone-title{font-size:13px;font-weight:600;color:var(--blue);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
 .srv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .srv-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 8px;text-align:center;cursor:pointer;transition:.2s;position:relative}
 .srv-item:hover{border-color:var(--gold);transform:translateY(-1px)}
@@ -297,27 +295,17 @@ function selectServer(name){
 function renderServerList(){
   const servers=DATA._servers||[];
   if(!servers.length){document.getElementById('serverList').innerHTML='<div style="text-align:center;color:var(--text2);padding:20px">加载中…</div>';return}
-  // Group by zone
-  const zones={};
+  let html='<div class="srv-grid">';
   servers.forEach(s=>{
-    const z=s.zone||'其他';
-    if(!zones[z])zones[z]=[];
-    zones[z].push(s);
+    const isActive=s.name===currentServer;
+    const hasData=DATA[s.name]&&Object.keys(DATA[s.name]).length>0;
+    html+='<div class="srv-item'+(isActive?' active':'')+(hasData?' has-data':'')+'" onclick="selectServer(\''+s.name+'\')">';
+    if(s.my)html+='<span class="si-tag">本服</span>';
+    html+='<div class="si-name">'+s.name+'</div>';
+    html+='<div class="si-data">'+(hasData?'✅ 有数据':'暂无数据')+'</div>';
+    html+='</div>';
   });
-  let html='';
-  for(const[zone,list]of Object.entries(zones)){
-    html+='<div class="srv-zone"><div class="srv-zone-title">'+zone+'</div><div class="srv-grid">';
-    list.forEach(s=>{
-      const isActive=s.name===currentServer;
-      const hasData=DATA[s.name]&&Object.keys(DATA[s.name]).length>0;
-      html+='<div class="srv-item'+(isActive?' active':'')+(hasData?' has-data':'')+'" onclick="selectServer(\''+s.name+'\')">';
-      if(s.my)html+='<span class="si-tag">本服</span>';
-      html+='<div class="si-name">'+s.name+'</div>';
-      html+='<div class="si-data">'+(hasData?'✅ 有数据':'暂无数据')+'</div>';
-      html+='</div>';
-    });
-    html+='</div></div>';
-  }
+  html+='</div>';
   document.getElementById('serverList').innerHTML=html;
 }
 
