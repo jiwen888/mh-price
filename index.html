@@ -201,6 +201,7 @@ body::after{content:'';position:fixed;inset:0;z-index:998;pointer-events:none;ba
   <div class="tab" onclick="switchTab('cat9')">📖普通兽决</div>
   <div class="tab" onclick="switchTab('cat10')">🔥高级兽决</div>
   <div class="tab" onclick="switchTab('profit')">💰五开收益</div>
+  <div class="tab" onclick="switchTab('goldrank')">🏆金价排名</div>
 </div>
 
 <div id="searchResults" class="page" style="display:none;padding:12px 16px 100px"></div>
@@ -217,6 +218,7 @@ body::after{content:'';position:fixed;inset:0;z-index:998;pointer-events:none;ba
 <div class="page" id="page-cat9"></div>
 <div class="page" id="page-cat10"></div>
 <div class="page" id="page-profit" style="padding:12px 16px 100px"></div>
+<div class="page" id="page-goldrank"></div>
 
 <div class="foot-seal">
   <div class="seal-line"></div>
@@ -430,6 +432,7 @@ function renderData(){
     if(!el)continue;
     el.innerHTML=cats[c]&&cats[c].length?renderCatSection(CAT_MAP[c]||'其他',cats[c]):'<div style="text-align:center;color:var(--text2);padding:40px">暂无数据</div>';
   }
+  renderGoldRank();
   renderProfit();
   setUpdateTime();
 }
@@ -590,6 +593,7 @@ function renderProfit(){
   });
 
   // Today summary
+  const ratio=(function(){const e=DATA["梦幻币比例"];if(!e)return 94;const k=Object.keys(e).sort();return e[k[k.length-1]].price||94;})();
   const records=getRecords().filter(r=>r.date===todayKey());
   const todayTotal=records.reduce((s,r)=>s+r.value,0);
   const monthRecords=getRecords().filter(r=>r.date&&r.date.startsWith(todayKey().substring(0,7)));
@@ -597,8 +601,8 @@ function renderProfit(){
 
   html+='<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:16px;margin:12px 0;border:1px solid var(--border)">';
   html+='<div style="display:flex;gap:12px">';
-  html+='<div style="flex:1;background:#0d1117;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text2)">今日收益</div><div style="color:var(--gold);font-size:20px;font-weight:800">'+todayTotal.toFixed(1)+'万</div><div style="font-size:10px;color:#ff9800">≈'+(todayTotal*94/1000).toFixed(2)+'元</div></div>';
-  html+='<div style="flex:1;background:#0d1117;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text2)">本月累计</div><div style="color:#00e676;font-size:20px;font-weight:800">'+monthTotal.toFixed(0)+'万</div><div style="font-size:10px;color:#ff9800">≈'+(monthTotal*94/1000).toFixed(0)+'元</div></div>';
+  html+='<div style="flex:1;background:#0d1117;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text2)">今日收益</div><div style="color:var(--gold);font-size:20px;font-weight:800">'+todayTotal.toFixed(1)+'万</div><div style="font-size:10px;color:#ff9800">≈'+(todayTotal*ratio/1000).toFixed(2)+'元</div></div>';
+  html+='<div style="flex:1;background:#0d1117;border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text2)">本月累计</div><div style="color:#00e676;font-size:20px;font-weight:800">'+monthTotal.toFixed(0)+'万</div><div style="font-size:10px;color:#ff9800">≈'+(monthTotal*ratio/1000).toFixed(0)+'元</div></div>';
   html+='</div></div>';
 
   // Today's record list
@@ -614,7 +618,7 @@ function renderProfit(){
   }
   html+='</div>';
 
-  html+='<div style="font-size:10px;color:var(--text2);margin-top:12px;text-align:center">💡 按梦幻币比例94元/1000万折算 · 价格随市场实时更新</div>';
+  html+='<div style="font-size:10px;color:var(--text2);margin-top:12px;text-align:center">💡 按梦幻币比例'+ratio+'元/1000万折算 · 价格随市场实时更新</div>';
   el.innerHTML=html;
 }
 
@@ -704,6 +708,52 @@ function loadData(){
     .then(d=>{const raw=atob(d.content.replace(/\n/g,''));const bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);const json=new TextDecoder('utf-8').decode(bytes);DATA=JSON.parse(json);showDone()})
     .catch(e=>{if(statusEl)statusEl.textContent='❌ 加载失败，请刷新重试';console.error('Load data failed:',e)})});
   function showDone(){if(statusEl)statusEl.textContent='✅ 数据加载完成';setTimeout(()=>{const s=document.getElementById('loadStatus');if(s)s.style.display='none'},1500);renderData();}
+}
+
+function renderGoldRank(){
+  const el=document.getElementById('page-goldrank');
+  if(!DATA['全服金价排名']){el.innerHTML='<div style="text-align:center;color:var(--text2);padding:40px">暂无金价排名数据</div>';return}
+  const dk=Object.keys(DATA['全服金价排名']).sort().reverse();
+  const latest=DATA['全服金价排名'][dk[0]];
+  const list=latest.data||[];
+  const maxPrice=Math.max(...list.map(s=>s.price));
+  const minPrice=Math.min(...list.map(s=>s.price));
+  const range=maxPrice-minPrice||1;
+  let html='';
+  html+='<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:16px;margin:0 0 12px;border:1px solid var(--border)">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
+  html+='<div style="font-size:16px;font-weight:700;color:var(--gold)">🏆 畅玩服金价排名</div>';
+  html+='<div style="font-size:11px;color:var(--text2)">'+dk[0]+' 更新</div>';
+  html+='</div>';
+  html+='<div style="font-size:11px;color:var(--text2)">💎 一代宗师为本服 · 金价越高=梦幻币越值钱</div>';
+  html+='</div>';
+  list.forEach((s,i)=>{
+    const pct=((s.price-minPrice)/range*100);
+    const isUp=s.change>0;
+    const isDown=s.change<0;
+    const isFlat=s.change===0;
+    const isMy=s.my;
+    const barColor=isMy?'var(--gold)':isUp?'var(--green)':'var(--red)';
+    const bgStyle=isMy?'background:linear-gradient(135deg,#f5c84215,#f5c84208);border:1px solid #f5c84244;':'background:var(--card);border:1px solid var(--border);';
+    html+='<div style="'+bgStyle+'border-radius:10px;padding:10px 12px;margin-bottom:6px">';
+    html+='<div style="display:flex;align-items:center;gap:8px">';
+    html+='<div style="width:24px;text-align:center;font-size:13px;font-weight:800;flex-shrink:0;color:'+(i<3?'var(--gold)':'var(--text2)')+'">'+(i+1)+'</div>';
+    html+='<div style="flex:1;min-width:0">';
+    html+='<div style="display:flex;align-items:center;gap:6px">';
+    html+='<span style="font-size:14px;font-weight:600;color:'+(isMy?'var(--gold)':'var(--text)')+'">'+s.server+'</span>';
+    if(isMy)html+='<span style="font-size:9px;background:var(--gold);color:var(--bg);padding:1px 5px;border-radius:3px;font-weight:700">本服</span>';
+    html+='</div>';
+    html+='<div style="margin-top:4px"><div style="height:6px;background:#1a1a2e;border-radius:3px;overflow:hidden"><div style="width:'+Math.max(pct,5)+'%;height:100%;background:'+barColor+';border-radius:3px;transition:width 0.5s"></div></div></div>';
+    html+='</div>';
+    html+='<div style="text-align:right;flex-shrink:0;min-width:70px">';
+    html+='<div style="font-size:15px;font-weight:800;color:var(--gold)">'+s.price+'</div>';
+    html+='<div style="font-size:10px;color:'+(isUp?'var(--green)':isDown?'var(--red)':'var(--text2)')+'">';
+    if(isUp)html+='↑';if(isDown)html+='↓';if(isFlat)html+='—';
+    html+=(isFlat?'0':Math.abs(s.change).toFixed(2))+'%</div>';
+    html+='</div></div></div>';
+  });
+  html+='<div style="font-size:10px;color:var(--text2);margin-top:12px;text-align:center">💡 金价=万两/元×3000 · 数据来源:畅玩服金价小程序</div>';
+  el.innerHTML=html;
 }
 
 // Auto refresh data every 5 min
