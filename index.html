@@ -111,6 +111,31 @@ body::after{content:'';position:fixed;inset:0;z-index:998;pointer-events:none;ba
 .key-item .ki-info{color:var(--text2);font-size:10px;margin-top:4px}
 .key-item .ki-used{color:var(--green)}
 .key-item .ki-expired{color:var(--red)}
+
+/* Server selector */
+.srv-btn{display:inline-flex;align-items:center;gap:4px;background:var(--card);padding:3px 10px;border-radius:6px;border:1px solid var(--border);cursor:pointer;font-size:12px;color:var(--gold);font-weight:600;transition:.2s}
+.srv-btn:hover{border-color:var(--gold);box-shadow:0 0 8px rgba(245,200,66,0.2)}
+.srv-btn .arrow{font-size:10px;transition:transform .2s}
+.srv-btn.open .arrow{transform:rotate(180deg)}
+.srv-overlay{position:fixed;inset:0;z-index:600;background:rgba(11,17,32,0.95);display:none;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.srv-overlay.show{display:block}
+.srv-overlay-inner{max-width:480px;margin:0 auto;padding:16px}
+.srv-overlay-title{font-size:16px;font-weight:700;color:var(--gold);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.srv-overlay-sub{font-size:11px;color:var(--text2);margin-bottom:16px}
+.srv-zone{margin-bottom:16px}
+.srv-zone-title{font-size:13px;font-weight:600;color:var(--blue);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.srv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.srv-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 8px;text-align:center;cursor:pointer;transition:.2s;position:relative}
+.srv-item:hover{border-color:var(--gold);transform:translateY(-1px)}
+.srv-item.active{border-color:var(--gold);background:rgba(245,200,66,0.1);box-shadow:0 0 12px rgba(245,200,66,0.15)}
+.srv-item .si-name{font-size:13px;font-weight:600;color:var(--text)}
+.srv-item.active .si-name{color:var(--gold)}
+.srv-item .si-tag{font-size:9px;position:absolute;top:4px;right:4px;background:var(--gold);color:var(--bg);padding:1px 4px;border-radius:3px;font-weight:700}
+.srv-item .si-data{font-size:10px;color:var(--text2);margin-top:2px}
+.srv-item.has-data .si-data{color:var(--green)}
+.srv-close{background:var(--border);border:none;color:var(--text2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.srv-close:hover{color:var(--red)}
+@media(max-width:360px){.srv-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -124,6 +149,15 @@ body::after{content:'';position:fixed;inset:0;z-index:998;pointer-events:none;ba
     <input type="text" id="keyInput" placeholder="输入卡密" autocomplete="off">
     <button onclick="verifyKey()">验 证</button>
     <div class="lock-hint">联系管理员获取卡密</div>
+  </div>
+</div>
+
+<!-- Server picker overlay -->
+<div class="srv-overlay" id="serverOverlay">
+  <div class="srv-overlay-inner">
+    <div class="srv-overlay-title"><span>🌐 选择区服</span><button class="srv-close" onclick="hideServerPicker()">✕</button></div>
+    <div class="srv-overlay-sub">选择区服查看对应物价数据 · 金价排名为全服数据</div>
+    <div id="serverList"></div>
   </div>
 </div>
 
@@ -170,10 +204,10 @@ body::after{content:'';position:fixed;inset:0;z-index:998;pointer-events:none;ba
 <div class="hdr">
   <div class="hdr-top">
     <div>
-      <h1>💰 梦幻物价·一代宗师</h1>
+      <h1>💰 梦幻物价·<span id="srvTitle">一代宗师</span></h1>
       <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
         <span class="verified"><span class="vdot"></span>已验证</span>
-        <span class="srv">一代宗师</span>
+        <span class="srv-btn" id="srvBtn" onclick="showServerPicker()"><span id="srvName">一代宗师</span><span class="arrow">▾</span></span>
       </div>
     </div>
     <div style="text-align:right">
@@ -223,7 +257,7 @@ body::after{content:'';position:fixed;inset:0;z-index:998;pointer-events:none;ba
 <div class="foot-seal">
   <div class="seal-line"></div>
   <div class="seal-brand">几闻人间意</div>
-  <div class="seal-txt">独家数据 · 一代宗师服务器<br>数据来源：世界频道/天台/摊位实时采集</div>
+  <div class="seal-txt">独家数据 · <span class="seal-srv">一代宗师</span>服务器<br>数据来源：世界频道/天台/摊位实时采集</div>
   <div class="seal-warn">⚠️ 未经授权转载必究 · 卡密制保护</div>
 </div>
 
@@ -234,7 +268,58 @@ let isAdmin=false;
 
 let DATA={};
 let UPDATE_TIME=0;
+let currentServer=localStorage.getItem('mh_server')||'一代宗师';
 const CAT_MAP={0:'💎宝石',1:'💰其他',2:'📦环装',3:'📜制造书',4:'⚒️制造铁',5:'💊药品/其他',6:'🏆五宝/道具',7:'⚔️点化/装备',8:'⚔️阵法',9:'📖普通兽决',10:'🔥高级兽决'};
+
+// Get current server's price data
+function getSD(){return DATA[currentServer]||{}}
+
+// Server picker
+function showServerPicker(){
+  document.getElementById('serverOverlay').classList.add('show');
+  document.getElementById('srvBtn').classList.add('open');
+  renderServerList();
+}
+function hideServerPicker(){
+  document.getElementById('serverOverlay').classList.remove('show');
+  document.getElementById('srvBtn').classList.remove('open');
+}
+function selectServer(name){
+  currentServer=name;
+  localStorage.setItem('mh_server',name);
+  document.getElementById('srvName').textContent=name;
+  document.getElementById('srvTitle').textContent=name;
+  const sealSrv=document.querySelector('.seal-srv');
+  if(sealSrv)sealSrv.textContent=name;
+  hideServerPicker();
+  renderData();
+}
+function renderServerList(){
+  const servers=DATA._servers||[];
+  if(!servers.length){document.getElementById('serverList').innerHTML='<div style="text-align:center;color:var(--text2);padding:20px">加载中…</div>';return}
+  // Group by zone
+  const zones={};
+  servers.forEach(s=>{
+    const z=s.zone||'其他';
+    if(!zones[z])zones[z]=[];
+    zones[z].push(s);
+  });
+  let html='';
+  for(const[zone,list]of Object.entries(zones)){
+    html+='<div class="srv-zone"><div class="srv-zone-title">'+zone+'</div><div class="srv-grid">';
+    list.forEach(s=>{
+      const isActive=s.name===currentServer;
+      const hasData=DATA[s.name]&&Object.keys(DATA[s.name]).length>0;
+      html+='<div class="srv-item'+(isActive?' active':'')+(hasData?' has-data':'')+'" onclick="selectServer(\''+s.name+'\')">';
+      if(s.my)html+='<span class="si-tag">本服</span>';
+      html+='<div class="si-name">'+s.name+'</div>';
+      html+='<div class="si-data">'+(hasData?'✅ 有数据':'暂无数据')+'</div>';
+      html+='</div>';
+    });
+    html+='</div></div>';
+  }
+  document.getElementById('serverList').innerHTML=html;
+}
 
 // === Card Key System (Self-Validating) ===
 const CK_SECRET='jwry_mh_2026x';
@@ -407,10 +492,20 @@ function getPrevPrice(dates){
 }
 
 function renderData(){
+  const SD=getSD();
+  if(!Object.keys(SD).length&&Object.keys(DATA).length){
+    // No data for current server
+    document.getElementById('totalCount').textContent='暂无数据';
+    document.getElementById('page-all').innerHTML='<div style="text-align:center;color:var(--text2);padding:40px"><div style="font-size:40px;margin-bottom:12px">🏜️</div><div style="font-size:14px">该区服暂无物价数据</div><div style="font-size:11px;margin-top:8px">切换到有数据的区服查看，或等待数据录入</div></div>';
+    for(let c=0;c<=10;c++){const el=document.getElementById('page-cat'+c);if(el)el.innerHTML='<div style="text-align:center;color:var(--text2);padding:40px">暂无数据</div>'}
+    renderGoldRank();
+    renderProfit();
+    return;
+  }
   if(!Object.keys(DATA).length)return;
   const cats={};
   let totalCount=0;
-  for(const[name,dates]of Object.entries(DATA)){
+  for(const[name,dates]of Object.entries(SD)){
     totalCount++;
     const cat=classifyItem(name);
     if(!cats[cat])cats[cat]=[];
@@ -458,7 +553,8 @@ function renderCatSection(title,items){
 }
 
 function getPrice(name){
-  const d=DATA[name];
+  const SD=getSD();
+  const d=SD[name];
   if(!d)return 0;
   const dk=Object.keys(d).sort().reverse();
   if(!dk.length)return 0;
@@ -593,7 +689,7 @@ function renderProfit(){
   });
 
   // Today summary
-  const ratio=(function(){const e=DATA["梦幻币比例"];if(!e)return 94;const k=Object.keys(e).sort();return e[k[k.length-1]].price||94;})();
+  const ratio=(function(){const SD=getSD();const e=SD["梦幻币比例"];if(!e)return 94;const k=Object.keys(e).sort();return e[k[k.length-1]].price||94})();
   const records=getRecords().filter(r=>r.date===todayKey());
   const todayTotal=records.reduce((s,r)=>s+r.value,0);
   const monthRecords=getRecords().filter(r=>r.date&&r.date.startsWith(todayKey().substring(0,7)));
@@ -672,8 +768,9 @@ function doSearch(){
   if(!kw){sr.style.display='none';document.getElementById('page-all').classList.add('active');return}
   sr.style.display='block';
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const SD=getSD();
   let html='',count=0;
-  for(const[name,dates]of Object.entries(DATA)){
+  for(const[name,dates]of Object.entries(SD)){
     if(name.toLowerCase().includes(kw)||kw.split('').every(c=>name.includes(c))){
       count++;
       const dk=Object.keys(dates).sort().reverse();
@@ -691,6 +788,15 @@ function init(){
   if(isAuthed()){
     document.getElementById('lockOverlay').classList.add('hidden');
     checkExpiry();
+  }
+  // Restore saved server
+  const saved=localStorage.getItem('mh_server');
+  if(saved){
+    currentServer=saved;
+    document.getElementById('srvName').textContent=saved;
+    document.getElementById('srvTitle').textContent=saved;
+    const sealSrv=document.querySelector('.seal-srv');
+    if(sealSrv)sealSrv.textContent=saved;
   }
   renderUpdateTime();
   loadData();
