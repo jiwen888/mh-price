@@ -578,7 +578,8 @@ function renderProfit(){
   const PROFIT_SRV_KEY='mh_profit_server';
   let profitSrv=localStorage.getItem(PROFIT_SRV_KEY)||currentServer;
   const SD=DATA[profitSrv]||{};
-  const ratio=getGoldRatio(profitSrv);
+  const rawRatio=getGoldRatio(profitSrv);
+  const ratio=profitSrv!=='一代宗师'?rawRatio/3:rawRatio;
   const PRODUCTS=[
     {cat:'🔥 高级兽决',color:'#ff4444',items:[
       {name:'高必杀',key:'高必杀_新',fb:2800},
