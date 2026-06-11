@@ -1684,5 +1684,211 @@
       "unit": "万",
       "source": "手动"
     }
+  },
+  "全服金价排名": {
+    "2026-06-11": {
+      "data": [
+        {
+          "server": "一代宗师",
+          "rate": 10.815,
+          "price": 276,
+          "change": -0.05,
+          "my": true
+        },
+        {
+          "server": "无与伦比",
+          "rate": 10.947,
+          "price": 273,
+          "change": -1.11
+        },
+        {
+          "server": "齐天大圣",
+          "rate": 11.082,
+          "price": 270,
+          "change": 0.34
+        },
+        {
+          "server": "2025",
+          "rate": 11.15,
+          "price": 270,
+          "change": -0.45
+        },
+        {
+          "server": "笑傲三界",
+          "rate": 11.171,
+          "price": 270,
+          "change": 0.77
+        },
+        {
+          "server": "横扫千军",
+          "rate": 11.105,
+          "price": 270,
+          "change": 0.01
+        },
+        {
+          "server": "龙卷雨击",
+          "rate": 11.125,
+          "price": 270,
+          "change": -0.65
+        },
+        {
+          "server": "此最相思",
+          "rate": 11.233,
+          "price": 267,
+          "change": -1.36
+        },
+        {
+          "server": "凌云殿",
+          "rate": 11.201,
+          "price": 267,
+          "change": 0
+        },
+        {
+          "server": "天下无双",
+          "rate": 11.206,
+          "price": 267,
+          "change": -0.82
+        },
+        {
+          "server": "将军令",
+          "rate": 11.289,
+          "price": 267,
+          "change": -0.61
+        },
+        {
+          "server": "紫气东来",
+          "rate": 11.349,
+          "price": 264,
+          "change": 0.06
+        },
+        {
+          "server": "#24",
+          "rate": 11.346,
+          "price": 264,
+          "change": 0.49
+        },
+        {
+          "server": "乘风破浪",
+          "rate": 11.332,
+          "price": 264,
+          "change": 0.07
+        },
+        {
+          "server": "纵横天下",
+          "rate": 11.355,
+          "price": 264,
+          "change": 0.1
+        },
+        {
+          "server": "再续前缘",
+          "rate": 11.352,
+          "price": 264,
+          "change": 0.06
+        },
+        {
+          "server": "大闹天宫",
+          "rate": 11.302,
+          "price": 264,
+          "change": -0.42
+        },
+        {
+          "server": "逍遥江湖",
+          "rate": 11.4,
+          "price": 264,
+          "change": 1
+        },
+        {
+          "server": "北俱芦洲",
+          "rate": 11.463,
+          "price": 261,
+          "change": 0.34
+        },
+        {
+          "server": "十方无敌",
+          "rate": 11.522,
+          "price": 261,
+          "change": -0.53
+        },
+        {
+          "server": "五谷丰登",
+          "rate": 11.473,
+          "price": 261,
+          "change": 0.61
+        },
+        {
+          "server": "钓鱼岛",
+          "rate": 11.444,
+          "price": 261,
+          "change": -1.6
+        },
+        {
+          "server": "恭喜发财",
+          "rate": 11.532,
+          "price": 261,
+          "change": -0.15
+        },
+        {
+          "server": "东海湾",
+          "rate": 11.478,
+          "price": 261,
+          "change": 0.81
+        },
+        {
+          "server": "高级幸运",
+          "rate": 11.467,
+          "price": 261,
+          "change": -0.12
+        },
+        {
+          "server": "群雄逐鹿",
+          "rate": 11.536,
+          "price": 261,
+          "change": -0.55
+        },
+        {
+          "server": "四海升平",
+          "rate": 11.514,
+          "price": 261,
+          "change": 0.87
+        },
+        {
+          "server": "生日快乐",
+          "rate": 11.48,
+          "price": 261,
+          "change": 0
+        },
+        {
+          "server": "平步青云",
+          "rate": 11.655,
+          "price": 258,
+          "change": 1.1
+        },
+        {
+          "server": "龙拳",
+          "rate": 11.594,
+          "price": 258,
+          "change": 0.51
+        },
+        {
+          "server": "苏堤春晓",
+          "rate": 11.634,
+          "price": 258,
+          "change": -0.05
+        },
+        {
+          "server": "游龙惊鸿",
+          "rate": 11.577,
+          "price": 258,
+          "change": 0
+        },
+        {
+          "server": "天蓬元帅",
+          "rate": 11.829,
+          "price": 255,
+          "change": 0
+        }
+      ],
+      "source": "手动录入"
+    }
   }
 }
