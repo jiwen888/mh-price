@@ -971,13 +971,18 @@ function renderProfit(){
   html+='<span style="font-size:11px;color:var(--text2)">金价:'+ratio+'元/千万</span>';
   html+='</div>';
 
-  // Product buttons by category
+  // Product buttons by category (only show items with real data)
   PRODUCTS.forEach(cat=>{
+    const catItems=[];
+    cat.items.forEach(it=>{
+      const p=getPrice(it.key,profitSrv);
+      if(p>0)catItems.push({name:it.name,price:p});
+    });
+    if(!catItems.length)return;
     html+='<div style="margin-bottom:10px"><div style="font-size:13px;font-weight:600;color:'+cat.color+';margin-bottom:6px">'+cat.cat+'</div>';
     html+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
-    cat.items.forEach(it=>{
-      const p=getPrice(it.key,profitSrv)||it.fb;
-      html+='<button onclick="addProfitItem(\''+it.name+'\','+p+',\''+profitSrv+'\')" style="background:'+cat.color+'22;color:'+cat.color+';border:1px solid '+cat.color+'55;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;white-space:nowrap">'+it.name+' <span style="opacity:0.7">'+p+'万</span></button>';
+    catItems.forEach(it=>{
+      html+='<button onclick="addProfitItem(\''+it.name+'\','+it.price+',\''+profitSrv+'\')" style="background:'+cat.color+'22;color:'+cat.color+';border:1px solid '+cat.color+'55;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;white-space:nowrap">'+it.name+' <span style="opacity:0.7">'+it.price+'万</span></button>';
     });
     html+='</div></div>';
   });
