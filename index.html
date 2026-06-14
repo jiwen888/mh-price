@@ -671,8 +671,8 @@ function getGoldRatio(srv){
     const latest=DATA['全服金价排名'][dk[0]];
     if(latest&&latest.data){
       const found=latest.data.find(s=>s.server===srv);
-      // found.rate = 每元可买万数, 元/千万 = 10000/rate; found.price 是万/元不是元/千万
-      if(found&&found.rate)return Math.round(10000/found.rate*100)/100;
+      // found.rate = 每元可买万数, 元/千万 = 1000/rate
+      if(found&&found.rate)return Math.round(1000/found.rate*100)/100;
     }
   }
   return 94; // fallback
