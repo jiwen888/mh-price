@@ -134,6 +134,11 @@ body::after{content:'';position:fixed;inset:0;z-index:998;pointer-events:none;ba
 .srv-close{background:var(--border);border:none;color:var(--text2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
 .srv-close:hover{color:var(--red)}
 @media(max-width:360px){.srv-grid{grid-template-columns:repeat(2,1fr)}}
+.zone-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.zone-tab{padding:5px 12px;border-radius:16px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text2);transition:.2s;white-space:nowrap}
+.zone-tab:hover{border-color:var(--gold);color:var(--text)}
+.zone-tab.active{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+.zone-tab .zt-count{font-size:10px;opacity:.7;margin-left:2px}
 </style>
 </head>
 <body>
@@ -150,11 +155,24 @@ body::after{content:'';position:fixed;inset:0;z-index:998;pointer-events:none;ba
   </div>
 </div>
 
+<!-- Expired renew overlay -->
+<div class="lock-overlay" id="expiredOverlay" style="display:none">
+  <div class="lock-box">
+    <h2 style="color:var(--gold)">⏰ 卡密已到期</h2>
+    <p>您之前激活的卡密已过期，请输入新卡密继续使用</p>
+    <div class="lock-err" id="expiredErr">卡密无效或已过期</div>
+    <input type="text" id="expiredKeyInput" placeholder="输入新卡密" autocomplete="off">
+    <button onclick="verifyExpiredKey()">激 活</button>
+    <div class="lock-hint">管理员QQ：921983871</div>
+  </div>
+</div>
+
 <!-- Server picker overlay -->
 <div class="srv-overlay" id="serverOverlay">
   <div class="srv-overlay-inner">
     <div class="srv-overlay-title"><span>🌐 选择区服</span><button class="srv-close" onclick="hideServerPicker()">✕</button></div>
     <div class="srv-overlay-sub">选择区服查看对应物价数据 · 金价排名为全服数据</div>
+    <div class="zone-tabs" id="zoneTabs"></div>
     <div id="serverList"></div>
   </div>
 </div>
@@ -336,6 +354,7 @@ function decodeKey(code){
   }catch(e){return null}
 }
 function isAuthed(){try{const a=JSON.parse(localStorage.getItem('mh_ck_auth'));if(!a||!a.expire)return false;return Date.now()<a.expire}catch(e){return false}}
+function isExpiredAuth(){try{const a=JSON.parse(localStorage.getItem('mh_ck_auth'));if(!a||!a.expire)return false;return Date.now()>=a.expire}catch(e){return false}}
 function setAuthed(key,days){localStorage.setItem('mh_ck_auth',JSON.stringify({key:key,expire:Date.now()+days*86400000,days:days}))}
 
 // Track used keys to prevent reuse on same device
@@ -363,6 +382,24 @@ function verifyKey(){
 
 function checkExpiry(){
   try{const a=JSON.parse(localStorage.getItem('mh_ck_auth'));if(!a)return;const r=Math.ceil((a.expire-Date.now())/86400000);if(r<=3&&r>0)alert('⏰ 卡密将在'+r+'天后到期，请及时续费')}catch(e){}
+}
+
+function verifyExpiredKey(){
+  const inp=document.getElementById('expiredKeyInput').value.trim();
+  const errEl=document.getElementById('expiredErr');
+  if(!inp){errEl.style.display='block';errEl.textContent='请输入新卡密';return}
+  const info=decodeKey(inp);
+  if(!info){errEl.style.display='block';errEl.textContent='卡密无效';return}
+  if(isKeyUsed(inp)){errEl.style.display='block';errEl.textContent='卡密已使用';return}
+  const now=Date.now();
+  const expireAt=info.createdAt+info.days*86400000;
+  if(now>expireAt){errEl.style.display='block';errEl.textContent='卡密已过期';return}
+  addUsedKey(inp);
+  setAuthed(inp,info.days);
+  document.getElementById('expiredOverlay').style.display='none';
+  const remain=Math.ceil((expireAt-now)/86400000);
+  alert('✅ 激活成功！有效期'+remain+'天');
+  checkExpiry();
 }
 
 // === Admin System ===
@@ -470,11 +507,13 @@ function classifyItem(name){
 }
 
 function getLatestPrice(dates){
+  if(Array.isArray(dates))return{price:dates[0],unit:'万',source:'同步',dateKey:'同步'};
   const dk=Object.keys(dates).sort().reverse();
   return dk.length?{...dates[dk[0]],dateKey:dk[0]}:null;
 }
 
 function getPrevPrice(dates){
+  if(Array.isArray(dates))return null;
   const dk=Object.keys(dates).sort().reverse();
   return dk.length>1?dates[dk[1]]:null;
 }
@@ -802,7 +841,8 @@ function getPrice(name,srv){
     if(d){
       const dk=Object.keys(d).sort().reverse();
       if(dk.length){
-        let p=d[dk[0]].price;
+        const val=Array.isArray(d)?d[0]:d[dk[0]];
+        let p=val&&val.price!==undefined?val.price:(Array.isArray(d)?d[0]:0);
         if(typeof p==='string'){const m=p.match(/[\d.]+/);p=m?parseFloat(m[0]):0;}
         if(p>0)return typeof p==='number'?p:parseFloat(p)||0;
       }
@@ -813,9 +853,10 @@ function getPrice(name,srv){
   if(short.length>=2){
     for(const[k,v]of Object.entries(sd)){
       if(k.includes(short)){
-        const dk=Object.keys(v).sort().reverse();
-        if(dk.length){
-          let p=v[dk[0]].price;
+        const dk2=Object.keys(v).sort().reverse();
+        if(dk2.length){
+          const val2=Array.isArray(v)?v[0]:v[dk2[0]];
+          let p=val2&&val2.price!==undefined?val2.price:(Array.isArray(v)?v[0]:0);
           if(typeof p==='string'){const m=p.match(/[\d.]+/);p=m?parseFloat(m[0]):0;}
           if(p>0)return typeof p==='number'?p:parseFloat(p)||0;
         }
@@ -829,7 +870,7 @@ function getGoldRatio(srv){
   // 1. 先取该区服"梦幻币比例"
   const SD=DATA[srv]||{};
   const e=SD["梦幻币比例"];
-  if(e){const k=Object.keys(e).sort();const v=e[k[k.length-1]];if(v&&v.price)return v.price}
+  if(e){if(Array.isArray(e))return e[0];const k=Object.keys(e).sort();const v=e[k[k.length-1]];if(v&&v.price)return v.price}
   // 2. 从全服金价排名取
   if(DATA['全服金价排名']){
     const dk=Object.keys(DATA['全服金价排名']).sort().reverse();
@@ -1239,10 +1280,10 @@ function doSearch(){
   for(const[name,dates]of Object.entries(SD)){
     if(name.toLowerCase().includes(kw)||kw.split('').every(c=>name.includes(c))){
       count++;
-      const dk=Object.keys(dates).sort().reverse();
-      const latest=dates[dk[0]];
-      const price=typeof latest.price==='number'?latest.price+(latest.unit||'万'):latest.price+(latest.unit||'万');
-      html+='<div class="search-item"><div class="si-name">'+name+'</div><div class="si-price">'+price+'</div><div class="si-meta">'+dk[0]+' · '+latest.source+'</div></div>';
+      let latest,price,meta;
+      if(Array.isArray(dates)){latest=dates[0];price=latest+'万';meta='同步';}
+      else{const dk=Object.keys(dates).sort().reverse();const d=dates[dk[0]];price=typeof d.price==='number'?d.price+(d.unit||'万'):d.price+(d.unit||'万');meta=dk[0]+' · '+(d.source||'');}
+      html+='<div class="search-item"><div class="si-name">'+name+'</div><div class="si-price">'+price+'</div><div class="si-meta">'+meta+'</div></div>';
     }
   }
   if(!count)html='<div style="text-align:center;color:var(--text2);padding:40px">没找到相关物品 😅</div>';
@@ -1254,6 +1295,10 @@ function init(){
   if(isAuthed()){
     document.getElementById('lockOverlay').classList.add('hidden');
     checkExpiry();
+  }else if(isExpiredAuth()){
+    // Previously activated key has expired - show renewal input
+    document.getElementById('lockOverlay').style.display='none';
+    document.getElementById('expiredOverlay').style.display='flex';
   }
   // Restore saved server
   const saved=localStorage.getItem('mh_server');
