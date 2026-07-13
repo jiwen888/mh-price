@@ -507,13 +507,11 @@ function classifyItem(name){
 }
 
 function getLatestPrice(dates){
-  if(Array.isArray(dates))return{price:dates[0],unit:'万',source:'同步',dateKey:'同步'};
   const dk=Object.keys(dates).sort().reverse();
   return dk.length?{...dates[dk[0]],dateKey:dk[0]}:null;
 }
 
 function getPrevPrice(dates){
-  if(Array.isArray(dates))return null;
   const dk=Object.keys(dates).sort().reverse();
   return dk.length>1?dates[dk[1]]:null;
 }
@@ -841,8 +839,7 @@ function getPrice(name,srv){
     if(d){
       const dk=Object.keys(d).sort().reverse();
       if(dk.length){
-        const val=Array.isArray(d)?d[0]:d[dk[0]];
-        let p=val&&val.price!==undefined?val.price:(Array.isArray(d)?d[0]:0);
+        let p=d[dk[0]].price;
         if(typeof p==='string'){const m=p.match(/[\d.]+/);p=m?parseFloat(m[0]):0;}
         if(p>0)return typeof p==='number'?p:parseFloat(p)||0;
       }
@@ -853,10 +850,9 @@ function getPrice(name,srv){
   if(short.length>=2){
     for(const[k,v]of Object.entries(sd)){
       if(k.includes(short)){
-        const dk2=Object.keys(v).sort().reverse();
-        if(dk2.length){
-          const val2=Array.isArray(v)?v[0]:v[dk2[0]];
-          let p=val2&&val2.price!==undefined?val2.price:(Array.isArray(v)?v[0]:0);
+        const dk=Object.keys(v).sort().reverse();
+        if(dk.length){
+          let p=v[dk[0]].price;
           if(typeof p==='string'){const m=p.match(/[\d.]+/);p=m?parseFloat(m[0]):0;}
           if(p>0)return typeof p==='number'?p:parseFloat(p)||0;
         }
@@ -870,7 +866,7 @@ function getGoldRatio(srv){
   // 1. 先取该区服"梦幻币比例"
   const SD=DATA[srv]||{};
   const e=SD["梦幻币比例"];
-  if(e){if(Array.isArray(e))return e[0];const k=Object.keys(e).sort();const v=e[k[k.length-1]];if(v&&v.price)return v.price}
+  if(e){const k=Object.keys(e).sort();const v=e[k[k.length-1]];if(v&&v.price)return v.price}
   // 2. 从全服金价排名取
   if(DATA['全服金价排名']){
     const dk=Object.keys(DATA['全服金价排名']).sort().reverse();
@@ -1280,10 +1276,10 @@ function doSearch(){
   for(const[name,dates]of Object.entries(SD)){
     if(name.toLowerCase().includes(kw)||kw.split('').every(c=>name.includes(c))){
       count++;
-      let latest,price,meta;
-      if(Array.isArray(dates)){latest=dates[0];price=latest+'万';meta='同步';}
-      else{const dk=Object.keys(dates).sort().reverse();const d=dates[dk[0]];price=typeof d.price==='number'?d.price+(d.unit||'万'):d.price+(d.unit||'万');meta=dk[0]+' · '+(d.source||'');}
-      html+='<div class="search-item"><div class="si-name">'+name+'</div><div class="si-price">'+price+'</div><div class="si-meta">'+meta+'</div></div>';
+      const dk=Object.keys(dates).sort().reverse();
+      const latest=dates[dk[0]];
+      const price=typeof latest.price==='number'?latest.price+(latest.unit||'万'):latest.price+(latest.unit||'万');
+      html+='<div class="search-item"><div class="si-name">'+name+'</div><div class="si-price">'+price+'</div><div class="si-meta">'+dk[0]+' · '+latest.source+'</div></div>';
     }
   }
   if(!count)html='<div style="text-align:center;color:var(--text2);padding:40px">没找到相关物品 😅</div>';
